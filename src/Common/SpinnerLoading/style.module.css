@@ -1,0 +1,7 @@
+.spin {
+    background: var(--main-color-1) !important;
+    height    : 11px !important;
+    width     : 11px !important;
+    margin    : 2px;
+    transition: all ease-in-out 3s;
+}

@@ -1,38 +1,101 @@
-.App {
-  text-align: center;
+:root {
+  --main-color-1: #619865;
+  --main-color-2: #ed8e8e;
+  --main-color-3: #F0F2F5
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+fieldset {
+  border: 2px solid #dedede !important;
+  margin: 20px auto;
+  width : 500px
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+fieldset legend {
+  font-size: 28px;
+  color    : tomato;
+  width    : auto;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.app {
+  background-color: var(--main-color-3);
 }
 
-.App-link {
-  color: #61dafb;
+.left-side {
+  border-right: 1px solid #e0e0e0
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.right-side {
+  border-left: 1px solid #e0e0e0
+}
+
+/* start inputs and forms gloabal css */
+.form-label {
+  color: var(--main-color-1)
+}
+
+input.form-control,
+textarea.form-control {
+  background-color: transparent;
+}
+
+input.form-control {
+  height       : 33px;
+  font-size    : 14px !important;
+  border-radius: 30px;
+
+}
+
+input.form-control:focus,
+textarea.form-control:focus {
+  box-shadow      : 0 0 12px 2px var(--main-color-1);
+  background-color: transparent
+}
+
+/* end inputs and forms gloabal css */
+/* start button global css */
+.btn-primary {
+  background-color: var(--main-color-1) !important;
+  border          : 1px solid var(--main-color-1) !important;
+}
+
+.btn-primary:focus {
+  box-shadow: 0 0 0.25rem #61986594 !important
+}
+
+/* end button global css */
+
+/* start special css classes created for multiple uses */
+.form-container {
+  background   : #e3e3e352;
+  margin       : 20px auto;
+  border       : 2px solid #ddd;
+  width        : 54%;
+  border-radius: 9px;
+  padding      : 30px 10px;
+}
+
+.error {
+  color: #fb0000ad !important
+}
+
+/* end special css classes created for multiple uses */
+
+/* start changing bootstrap Navs css */
+.nav-justified .nav-item .nav-link {
+  color: var(--main-color-1)
+}
+
+.nav-tabs .nav-link.active {
+  background-color: transparent !important;
+  border-color    : #dee2e6 #dee2e6 var(--main-color-1) !important;
+}
+
+/* end changing bootstrap Navs css */
+
+.swal2-popup {
+  font-size: 12px !important;
+  font-family: Georgia, serif;
+}
+.swal2-confirm {
+  background-color: var(--main-color-1) !important;
 }

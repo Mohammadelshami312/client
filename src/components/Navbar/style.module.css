@@ -1,0 +1,14 @@
+.nav {
+    background-color: var(--main-color-1) !important
+}
+
+.brand {
+    border        : 1px solid #fff;
+    border-radius : 20%;
+    width         : 150px;
+    text-align    : center;
+    letter-spacing: 3px;
+    font-weight   : bold;
+    color         : #fff !important;
+    box-shadow: 0px 0px 9px #65ff70;
+}
