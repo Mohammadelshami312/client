@@ -1,22 +1,28 @@
 import "./App.css";
-import Comments from "./Comments";
-import Footer from "./components/Footer";
+import { useContext } from "react";
+import Comments from "./pages/Comments";
+import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import { Container, Row, Grid, Col } from "react-bootstrap";
+import { Row, Col } from "react-bootstrap";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import axios from "axios";
+import { AuthProvider, AuthContext } from "./AuthContext";
 
-axios.defaults.baseURL = "http://localhost:8000/";
+//axios
+axios.defaults.baseURL = "http://127.0.0.1/backend";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 axios.defaults.headers.post["Accept"] = "application/json";
 axios.defaults.withCredentials = true;
 
 function App() {
+  const authContext = useContext(AuthContext);
+  const routePermission = localStorage.getItem("auth_token");
+
   return (
     <Router>
       <div style={{ overflowX: "hidden" }}>
-        <Footer />
+        <Navbar />
         <div className="app">
           <Row style={{ minHeight: "100vh" }}>
             <Col className="left-side d-none d-md-block"></Col>
@@ -28,28 +34,33 @@ function App() {
             >
               <Switch>
                 <Route exact path="/">
-                  {localStorage.getItem("auth_token") ? (
-                    <Comments />
+                  {routePermission ? (
+                    <Comments currentUserId={localStorage.getItem("id")} />
                   ) : (
                     <Login />
                   )}
                 </Route>
 
                 <Route path="/home">
-                  <Comments currentUserId={localStorage.getItem("id")} />
+                  {routePermission ? (
+                    <Comments currentUserId={localStorage.getItem("id")} />
+                  ) : (
+                    <Login />
+                  )}
                 </Route>
                 <Route path="/register">
-                  <Register />
-                  {/*
-                  localStorage.getItem("auth_token") ? (
-                    <Comments />
+                  {routePermission ? (
+                    <Comments currentUserId={localStorage.getItem("id")} />
                   ) : (
                     <Register />
-                  )
-                  */}
+                  )}
                 </Route>
                 <Route path="/login">
-                  <Login />
+                  {routePermission ? (
+                    <Comments currentUserId={localStorage.getItem("id")} />
+                  ) : (
+                    <Login />
+                  )}
                 </Route>
               </Switch>
             </Col>
@@ -61,4 +72,12 @@ function App() {
   );
 }
 
-export default App;
+function App2() {
+  return (
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  );
+}
+
+export default App2;

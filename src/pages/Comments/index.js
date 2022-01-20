@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import { Nav } from "react-bootstrap";
 import axios from "axios";
 import { CSSTransition } from "react-transition-group";
-import CommentForm from "./CommentForm";
-import Comment from "./Comment";
+import CommentForm from "./components/CommentForm";
+import Comment from "./components/Comment";
 import {
   getComments as getCommentsApi,
   createComment as createCommentApi,
   updateComment as updateCommentApi,
   deleteComment as deleteCommentApi,
   getCategories as getCategoriesApi,
-} from "./api";
+} from "../../API/api";
 
-import SpinnerLoading from "./Common/SpinnerLoading";
+import SpinnerLoading from "../../Common/SpinnerLoading";
 
 const TopicsNav = ({ setCategoryId }) => {
   const [categories, setCategories] = useState([]);
@@ -92,28 +92,29 @@ const Comments = ({ commentsUrl, currentUserId }) => {
 
   // add comment to database
   const addComment = (text, parentId) => {
-    /*
-    createCommentApi(text, parentId).then((comment) => {
-      setBackendComments([comment, ...backendComments]);
-      setActiveComment(null);
-    });
-    */
-
     const data = {
       body: text,
       userId: localStorage.getItem("id"),
       parentId: parentId === undefined ? null : parentId,
       createdAt: new Date().toISOString(),
     };
-    axios.post(`/api/comment/${categoryId}`, data).then((resp) => {
-      if (resp.status == 200) {
-        setBackendComments([
-          { ...data, id: resp.data.commentId },
-          ...backendComments,
-        ]);
-        setActiveComment(null);
-      }
-    });
+
+    //send data
+    axios
+      .post(`/api/comment/${categoryId}`, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
+      })
+      .then((resp) => {
+        if (resp.status == 200) {
+          setBackendComments([
+            { ...data, id: resp.data.commentId },
+            ...backendComments,
+          ]);
+          setActiveComment(null);
+        }
+      });
   };
 
   const updateComment = (body, commentId) => {
@@ -121,29 +122,43 @@ const Comments = ({ commentsUrl, currentUserId }) => {
       body,
     };
     //update comment request
-    axios.put(`/api/comment/${commentId}`, data).then((resp) => {
-      if (resp.status === 200) {
-        const updatedBackendComments = backendComments.map((backendComment) => {
-          if (backendComment.id === commentId) {
-            return { ...backendComment, body };
-          }
-          return backendComment;
-        });
-        setBackendComments(updatedBackendComments);
-        setActiveComment(null);
-      }
-    });
+    axios
+      .put(`/api/comment/${commentId}`, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
+      })
+      .then((resp) => {
+        if (resp.status === 200) {
+          const updatedBackendComments = backendComments.map(
+            (backendComment) => {
+              if (backendComment.id === commentId) {
+                return { ...backendComment, body };
+              }
+              return backendComment;
+            }
+          );
+          setBackendComments(updatedBackendComments);
+          setActiveComment(null);
+        }
+      });
   };
   const deleteComment = (commentId) => {
     if (window.confirm("Are you sure you want to remove comment?")) {
-      axios.delete(`/api/comment/${commentId}`).then((resp) => {
-        if (resp.status === 200) {
-          const updatedBackendComments = backendComments.filter(
-            (backendComment) => backendComment.id !== commentId
-          );
-          setBackendComments(updatedBackendComments);
-        }
-      });
+      axios
+        .delete(`/api/comment/${commentId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          },
+        })
+        .then((resp) => {
+          if (resp.status === 200) {
+            const updatedBackendComments = backendComments.filter(
+              (backendComment) => backendComment.id !== commentId
+            );
+            setBackendComments(updatedBackendComments);
+          }
+        });
     }
   };
 

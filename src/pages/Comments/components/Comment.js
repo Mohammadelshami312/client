@@ -19,8 +19,9 @@ const Comment = ({
     activeComment &&
     activeComment.id === comment.id &&
     activeComment.type === "replying";
-  const fiveMinutes = 100000;
-  const timePassed = false; //new Date() - new Date(comment.createdAt) > fiveMinutes;
+  // const fiveMinutes = 100000;
+  // const timePassed = false; //new Date() - new Date(comment.createdAt) > fiveMinutes;
+
   const [viewComments, setViewComments] = useState(false);
   const canDelete = currentUserId == comment.userId; //&& replies.length === 0;
   const canReply = Boolean(currentUserId);
@@ -36,7 +37,9 @@ const Comment = ({
           width="50"
           height="50"
         /> */}
-        <div className="author-first-name">M</div>
+        <div className="author-first-name">
+          {comment.userName && comment.userName.charAt(0)}
+        </div>
       </div>
       <div className="comment-right-part">
         <div className="comment-content">

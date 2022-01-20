@@ -1,28 +1,19 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Form, Button } from "react-bootstrap";
-import { Formik, Field, ErrorMessage } from "formik";
+import { Formik, ErrorMessage } from "formik";
 import { registerSchema } from "../../Validations/RegisterValidation";
 import axios from "axios";
 import Swal from "sweetalert2";
-export default function Register() {
-  const onSubmit = (values) => {
-    const { userName, password, confirmPassword } = values;
-    // const Toast = Swal.mixin({
-    //   toast: true,
-    //   position: "top-end",
-    //   showConfirmButton: false,
-    //   timer: 3000,
-    //   timerProgressBar: true,
-    //   didOpen: (toast) => {
-    //     toast.addEventListener("mouseenter", Swal.stopTimer);
-    //     toast.addEventListener("mouseleave", Swal.resumeTimer);
-    //   },
-    // });
+import { useHistory } from "react-router-dom";
+import { AuthContext } from "../../AuthContext";
 
-    // Toast.fire({
-    //   icon: "success",
-    //   title: "Signed in successfully",
-    // });
+export default function Register() {
+  let history = useHistory();
+  const authContext = useContext(AuthContext);
+  //submit form using axios
+  const onSubmit = (values) => {
+    const { userName, password } = values;
+
     const data = {
       userName,
       password,
@@ -32,15 +23,37 @@ export default function Register() {
     sanctum/csrf-cookie endpoint to initialize CSRF protection for the application: */
     axios.get("/sanctum/csrf-cookie").then((response) => {
       // register...
-      axios.post("/api/register", data).then((resp) => {
-        if (resp.data.status == 200) {
-          localStorage.setItem("auth_token", resp.data.token);
-          localStorage.setItem("auth_name", resp.data.username);
-          localStorage.setItem("id", resp.data.userId);
-          //history.push('/...')
-        } else {
-        }
-      });
+      axios
+        .post("/api/register", data)
+        .then((resp) => {
+          if (resp.data.status === 200) {
+            // token and username
+            const token = resp.data.token;
+            const userName = resp.data.username;
+            localStorage.setItem("auth_token", token);
+            localStorage.setItem("auth_name", userName);
+            localStorage.setItem("id", resp.data.userId);
+            authContext.setAuth({ token, userName });
+
+            //alert message
+            const Toast = Swal.mixin({
+              toast: true,
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener("mouseenter", Swal.stopTimer);
+                toast.addEventListener("mouseleave", Swal.resumeTimer);
+              },
+            });
+            Toast.fire({
+              icon: "success",
+              title: "registration successfully",
+            }).then((resp1) => history.push("/home"));
+          }
+        })
+        .catch((error) => Swal.fire("error", "please try again", "warning"));
     });
   };
   const get = () => {

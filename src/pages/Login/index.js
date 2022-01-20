@@ -1,14 +1,16 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Form, Button } from "react-bootstrap";
-import { Formik, Field, ErrorMessage } from "formik";
+import { Formik, ErrorMessage } from "formik";
 import { loginSchema } from "../../Validations/LoginValidation";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { login as loginApi } from "../../api";
+import { AuthContext } from "../../AuthContext";
 
-export default function Login() {
+export default function Login({ setLoggedIn }) {
   let history = useHistory();
+  const authContext = useContext(AuthContext);
+
   const onSubmit = (values) => {
     const { userName, password } = values;
 
@@ -20,45 +22,49 @@ export default function Login() {
 
     //login request
     axios.get("/sanctum/csrf-cookie").then((response) => {
-      axios.post("/api/login", data).then((resp) => {
-        if (resp.data.status === 200) {
-          localStorage.setItem("auth_token", resp.data.token);
-          localStorage.setItem("auth_name", resp.data.username);
-          localStorage.setItem("id", resp.data.userId);
-          const Toast = Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener("mouseenter", Swal.stopTimer);
-              toast.addEventListener("mouseleave", Swal.resumeTimer);
-            },
-          });
-          Toast.fire({
-            icon: "success",
-            title: "Signed in successfully",
-          }).then((resp1) => history.push("/home"));
-        } else {
-          if (resp.data.status === 401)
-            Swal.fire(
-              "Invalid credentials or error network, please try again",
-              resp.data.message,
-              "warning"
-            );
-        }
-      });
+      axios
+        .post("/api/login", data)
+        .then((resp) => {
+          if (resp.data.status === 200) {
+            // token and username
+            const token = resp.data.token;
+            const userName = resp.data.username;
+            localStorage.setItem("auth_token", token);
+            localStorage.setItem("auth_name", userName);
+            localStorage.setItem("id", resp.data.userId);
+            authContext.setAuth({token, userName});
+            
+            const Toast = Swal.mixin({
+              toast: true,
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener("mouseenter", Swal.stopTimer);
+                toast.addEventListener("mouseleave", Swal.resumeTimer);
+              },
+            });
+            Toast.fire({
+              icon: "success",
+              title: "Signed in successfully",
+            }).then((resp1) => {
+              console.log(authContext);
+              history.push("/home");
+            });
+          } else {
+            if (resp.data.status === 401)
+              Swal.fire(
+                "Invalid credentials or error network, please try again",
+                resp.data.message,
+                "warning"
+              );
+          }
+        })
+        .catch((error) => {
+          Swal.fire("error", "please try again", "warning");
+        });
     });
-  };
-  const get = () => {
-    axios
-      .get("/api/test", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-        },
-      })
-      .then((resp) => console.log(resp));
   };
 
   return (
